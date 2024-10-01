@@ -5,8 +5,53 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from .forms import MaterialForm
 from django.contrib.auth import logout
+from django.shortcuts import render, redirect
+from django.contrib.auth.models import User
+from django.contrib.auth import login
+from django.contrib.auth.hashers import make_password
+from django.contrib import messages
 
+from .models import Usuario  # Importar el modelo personalizado
 
+# Vista para el registro de usuarios
+def registro_view(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        last_name = request.POST['last_name']  # Recibir apellido
+        email = request.POST['email']  # Recibir email
+        password = request.POST['password']
+        password_confirm = request.POST['password_confirm']
+        rol = request.POST['rol']
+        
+        # Validar que ambas contraseñas coincidan
+        if password != password_confirm:
+            messages.error(request, 'Las contraseñas no coinciden.')
+            return redirect('registro')  # Redirigir al formulario de registro en caso de error
+        
+        # Validar que el email no esté ya registrado
+        if Usuario.objects.filter(email=email).exists():
+            messages.error(request, 'El email ya está registrado.')
+            return redirect('registro')
+
+        # Crear usuario y asignar los campos adicionales
+        user = Usuario.objects.create(
+            username=username,
+            last_name=last_name,  # Guardar apellido
+            email=email,  # Guardar email
+            password=make_password(password),  # Encriptar la contraseña
+            rol=rol  # Asignar el rol
+        )
+        
+        # Iniciar sesión automáticamente después de registrar
+        login(request, user)
+        
+        # Redireccionar dependiendo del rol
+        if rol == 'RECOLECTOR':
+            return redirect('formulario_material')
+        else:
+            return redirect('home')
+    
+    return render(request, 'usuarios/registro.html')
 
 # Vista para el login
 def login_view(request):

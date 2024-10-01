@@ -51,6 +51,14 @@
         button:hover {
             background-color: #219150; /* Color al pasar el cursor por encima */
         }
+        /* Botón cancelar */
+        .cancel-button {
+            background-color: #e74c3c; /* Color rojo */
+            margin-left: 10px; /* Espacio entre botones */
+        }
+        .cancel-button:hover {
+            background-color: #c0392b; /* Color rojo oscuro */
+        }
         /* Estilo para etiquetas */
         label {
             color: white; /* Color de las etiquetas */
@@ -71,6 +79,9 @@
         {{ form.cantidad }}  <!-- Aquí se inserta el campo del formulario -->
         
         <button type="submit">Enviar</button>
+        <a href="{% url 'home' %}">
+            <button type="button" class="cancel-button">Cancelar</button> <!-- Botón cancelar -->
+        </a>
     </form>
 
     <script>

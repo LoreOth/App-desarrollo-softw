@@ -43,7 +43,12 @@
         <h1>Bienvenido a nuestro Sistema</h1> <!-- Título de la página de inicio -->
         <p>Utiliza el menú para navegar a las diferentes secciones.</p> <!-- Mensaje de bienvenida -->
         <a href="{% url 'logOut' %}">Cerrar Sesión</a> <!-- Enlace para cerrar sesión -->
-        <a href="{% url 'formulario_material' %}">Registrar Material</a> <!-- Enlace para el formulario -->
+        
+        <!-- Mostrar "Registrar Material" solo si el usuario es RECOLECTOR -->
+        {% if request.user.rol == 'RECOLECTOR' %}
+            <a href="{% url 'formulario_material' %}">Registrar Material</a> <!-- Enlace para el formulario -->
+        {% endif %}
+        
     </div>
 </body>
 </html>
