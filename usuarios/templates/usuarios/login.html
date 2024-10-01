@@ -14,6 +14,7 @@
             height: 100vh;
             margin: 0;
             color: white; /* Texto blanco para todo el cuerpo */
+            padding: 1em; /* Espaciado interno para pequeños dispositivos */
         }
         h1 {
             text-align: center;
@@ -25,7 +26,8 @@
             padding: 30px;
             border-radius: 10px; /* Bordes redondeados */
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra para profundidad */
-            width: 300px; /* Ancho del formulario */
+            width: 100%; /* Ancho completo para pequeños dispositivos */
+            max-width: 400px; /* Ancho máximo del formulario */
             text-align: center; /* Centrar texto */
         }
         input[type="text"], input[type="password"] {
@@ -47,6 +49,7 @@
             cursor: pointer; /* Cambia el cursor al pasar por encima */
             transition: background-color 0.3s; /* Efecto de transición */
             font-size: 1.1em; /* Tamaño del texto */
+            width: 100%; /* Botón ocupa todo el ancho del formulario */
         }
         button:hover {
             background-color: #219150; /* Color al pasar el cursor por encima */

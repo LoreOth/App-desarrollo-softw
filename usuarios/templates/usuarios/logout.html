@@ -15,6 +15,7 @@
             height: 100vh;
             margin: 0;
             text-align: center; /* Centrar texto */
+            padding: 1em; /* Espaciado interno para dispositivos pequeños */
         }
         h1 {
             font-size: 2.5em; /* Tamaño del texto */
@@ -31,6 +32,10 @@
             border-radius: 5px; /* Bordes redondeados del enlace */
             padding: 10px 15px; /* Espaciado interno */
             transition: background-color 0.3s, color 0.3s; /* Efecto de transición */
+            display: inline-block; /* Para que el padding funcione correctamente */
+            margin: 5px 0; /* Margen vertical entre los enlaces */
+            width: 100%; /* Ancho completo para dispositivos pequeños */
+            max-width: 300px; /* Ancho máximo del enlace */
         }
         a:hover {
             background-color: #27ae60; /* Color de fondo al pasar el cursor */
