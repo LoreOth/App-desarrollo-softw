@@ -1,6 +1,8 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-
+from django.contrib.auth.models import User
+from django.conf import settings
+from django import forms
 class Usuario(AbstractUser):
     RECOLECTOR = 'RECOLECTOR'
     ADMINISTRADOR = 'ADMINISTRADOR'
@@ -28,3 +30,4 @@ class Usuario(AbstractUser):
         help_text='Specific permissions for this user.',
         verbose_name='user permissions'
     )
+    

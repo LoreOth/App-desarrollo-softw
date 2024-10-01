@@ -10,6 +10,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import login
 from django.contrib.auth.hashers import make_password
 from django.contrib import messages
+from .forms import MaterialForm
 
 from .models import Usuario  # Importar el modelo personalizado
 
@@ -70,16 +71,18 @@ def login_view(request):
 # Vista para el formulario del recolector
 @login_required
 def formulario_material(request):
-    if request.user.rol != 'RECOLECTOR':
-        return redirect('home')
     if request.method == 'POST':
         form = MaterialForm(request.POST)
         if form.is_valid():
-            # Lógica para procesar el formulario
-            return redirect('gracias')
+            material = form.save(commit=False)  # Usa save() aquí
+            material.user = request.user  # Asegúrate de que el usuario esté asociado
+            material.save()  # Guarda la instancia en la base de datos
+            return redirect('home')  # Redirige a otra página después de guardar
     else:
         form = MaterialForm()
+
     return render(request, 'usuarios/formulario_material.html', {'form': form})
+
 
 def gracias(request):
     return render(request, 'usuarios/gracias.html')
