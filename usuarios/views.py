@@ -14,6 +14,8 @@ from .forms import MaterialForm
 
 from .models import Usuario  # Importar el modelo personalizado
 
+from .functions.load_material import run_load_material
+
 # Vista para el registro de usuarios
 def registro_view(request):
     if request.method == 'POST':
@@ -74,9 +76,12 @@ def formulario_material(request):
     if request.method == 'POST':
         form = MaterialForm(request.POST)
         if form.is_valid():
-            material = form.save(commit=False)  # Usa save() aquí
+            material = form.save(commit = False)  # Usa save() aquí
             material.user = request.user  # Asegúrate de que el usuario esté asociado
             material.save()  # Guarda la instancia en la base de datos
+
+            run_load_material(material.user_id, material.id)
+            
             return redirect('home')  # Redirige a otra página después de guardar
     else:
         form = MaterialForm()
