@@ -29,7 +29,7 @@
             max-width: 400px; /* Ancho máximo */
             text-align: center; /* Centrar texto */
         }
-        input[type="number"], input[type="text"] {
+        input[type="number"], input[type="text"], select {
             width: 100%; /* Ancho completo del input */
             padding: 10px; /* Espaciado interno */
             border: 2px solid #27ae60; /* Borde verde */
@@ -38,6 +38,14 @@
             font-size: 1em; /* Tamaño de texto */
             background-color: #ecf0f1; /* Fondo blanco para los inputs */
             color: #2c3e50; /* Texto oscuro dentro de los inputs */
+            appearance: none; /* Eliminar el estilo predeterminado del navegador */
+        }
+        /* Estilos para el select */
+        select {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><polygon points="0,0 20,0 10,10" style="fill:%232c3e50;"/></svg>'); /* Añadir un icono de flecha */
+            background-repeat: no-repeat;
+            background-position: right 10px center; /* Posicionar la flecha */
+            background-size: 12px; /* Tamaño de la flecha */
         }
         button {
             background-color: #27ae60; /* Color del botón verde */
@@ -86,17 +94,17 @@
 <body>
     <form method="post">
         {% csrf_token %}
-        <h1>Registrar Material</h1> <!-- Título del formulario -->
+        <h1>Registrar Material</h1>
         
         <label for="id_material">Material:</label>
-        {{ form.material }}  <!-- Aquí se inserta el campo del formulario -->
+        {{ form.material }}  <!-- Se mostrará un campo select para elegir el material -->
         
         <label for="id_cantidad">Cantidad:</label>
-        {{ form.cantidad }}  <!-- Aquí se inserta el campo del formulario -->
+        {{ form.cantidad }}
         
         <button type="submit">Enviar</button>
         <a href="{% url 'home' %}">
-            <button type="button" class="cancel-button">Cancelar</button> <!-- Botón cancelar -->
+            <button type="button" class="cancel-button">Cancelar</button>
         </a>
     </form>
 
