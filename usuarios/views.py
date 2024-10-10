@@ -1,9 +1,9 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 
 from django.contrib.auth import authenticate, login
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from .forms import MaterialForm
+from .forms import Material, MaterialForm, Materiales
 from django.contrib.auth import logout
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
@@ -93,9 +93,45 @@ def gracias(request):
     return render(request, 'usuarios/gracias.html')
 
 def home(request):
+    # Si el usuario es un depósito, mostrar los materiales pendientes y aprobados
+    if request.user.rol == 'DEPOSITO':
+        # Obtener materiales que no han sido aprobados (supervisado=False)
+        materiales_pendientes = Material.objects.filter(supervisado=False)
+        
+        # Obtener materiales que ya han sido aprobados (supervisado=True)
+        materiales_aprobados = Material.objects.filter(supervisado=True)
+        
+        # Pasar estas listas al contexto de la plantilla
+        return render(request, 'usuarios/home.html', {
+            'materiales_pendientes': materiales_pendientes,
+            'materiales_aprobados': materiales_aprobados,
+        })
+    
+    # Si el usuario no es un depósito, simplemente renderizar la página
     return render(request, 'usuarios/home.html')
 
 
 def logout_view(request):
     logout(request)
     return render(request, 'usuarios/logout.html')
+
+# Vista para el formulario del recolector
+@login_required
+def aprobar_material(request, material_id):
+    # Obtener el material por ID
+    material = get_object_or_404(Material, id=material_id)
+    
+    cantidad_a_sumar = material.cantidad  
+    
+    # Cambiar el estado del material a supervisado (aprobado)
+    material.supervisado = True
+    material.save()
+    
+    # Buscar el material en la tabla Materiales por su nombre
+    material_stock = get_object_or_404(Materiales, nombre=material.material)
+    
+    # Sumar la cantidad a la columna cantidad_total
+    material_stock.cantidad_total += cantidad_a_sumar
+    material_stock.save()
+    
+    return redirect('home')  # Redirigir a la página de inicio

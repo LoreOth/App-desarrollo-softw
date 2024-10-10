@@ -1,5 +1,8 @@
 ### se va a generar la comunicación con Bonita y hacer la carga de materiales
+from django.shortcuts import get_object_or_404, redirect
 import requests
+
+from usuarios.forms import Material, Materiales
 
 USERNAME = 'walter.bates'
 PASSWORD = 'bpm'
@@ -165,3 +168,4 @@ def run_load_material(id_usuario, id_usuario_material):
 
     execute_user_task(x_bonita_api_cookie, jsessionid, task_id)
     case_id = instantiated_process["caseId"]
+
