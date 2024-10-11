@@ -1,8 +1,9 @@
 ### se va a generar la comunicación con Bonita y hacer la carga de materiales
 import requests
 
-USERNAME = 'walter.bates'
-PASSWORD = 'bpm'
+USERNAME = 'recolector1'
+PASSWORD = '123'
+ID_RECOLECTOR=43
 
 def login():
     login_url = "http://localhost:8080/bonita/loginservice"
@@ -154,14 +155,14 @@ def run_load_material(id_usuario, id_usuario_material):
 
     process_id = find_process_by_name(processes, process_name)
     instantiated_process = instantiate_process(x_bonita_api_cookie, jsessionid, process_id)
-
+    case_id = instantiated_process["caseId"]
     # updateamos las variables de bonita
     update_case_variable(x_bonita_api_cookie, jsessionid, case_id, 'id_recolector', id_usuario)
     update_case_variable(x_bonita_api_cookie, jsessionid, case_id, 'id_solicitud', id_usuario_material)
     
     task_id = get_task_id_by_case_id(x_bonita_api_cookie, jsessionid, case_id)
 
-    assign_user_to_task_id(x_bonita_api_cookie, jsessionid, task_id, 4)
+    assign_user_to_task_id(x_bonita_api_cookie, jsessionid, task_id, ID_RECOLECTOR)
 
     execute_user_task(x_bonita_api_cookie, jsessionid, task_id)
-    case_id = instantiated_process["caseId"]
+    
