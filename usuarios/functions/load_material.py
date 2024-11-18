@@ -4,8 +4,11 @@ import requests
 
 from usuarios.forms import Material, Materiales
 
-USERNAME = 'walter.bates'
-PASSWORD = 'bpm'
+#USERNAME = 'walter.bates'
+#PASSWORD = 'bpm'
+
+USERNAME = 'Recolector1'
+PASSWORD = '123'
 
 def login():
     login_url = "http://localhost:8080/bonita/loginservice"
@@ -154,11 +157,13 @@ def run_load_material(id_usuario, id_usuario_material):
 
     processes = get_processes(x_bonita_api_cookie, jsessionid)
     process_name = processes[0]['name']
-
     process_id = find_process_by_name(processes, process_name)
+
     instantiated_process = instantiate_process(x_bonita_api_cookie, jsessionid, process_id)
 
     # updateamos las variables de bonita
+    case_id = instantiated_process["caseId"]
+
     update_case_variable(x_bonita_api_cookie, jsessionid, case_id, 'id_recolector', id_usuario)
     update_case_variable(x_bonita_api_cookie, jsessionid, case_id, 'id_solicitud', id_usuario_material)
     
@@ -167,5 +172,4 @@ def run_load_material(id_usuario, id_usuario_material):
     assign_user_to_task_id(x_bonita_api_cookie, jsessionid, task_id, 4)
 
     execute_user_task(x_bonita_api_cookie, jsessionid, task_id)
-    case_id = instantiated_process["caseId"]
 
