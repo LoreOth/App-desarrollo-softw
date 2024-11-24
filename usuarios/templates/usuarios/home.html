@@ -105,32 +105,34 @@
         <p>Utiliza el menú para navegar a las diferentes secciones.</p>
 
         {% if request.user.rol == 'DEPOSITO' %}
-            <h2>Materiales Pendientes</h2>
-            <table>
+        <h2>Materiales Pendientes</h2>
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Cantidad</th>
+                <th>Cantidad Real</th>
+                <th>Aprobar</th>
+            </tr>
+            {% for material in materiales_pendientes %}
                 <tr>
-                    <th>ID</th>
-                    <th>Nombre</th>
-                    <th>Cantidad</th>
-                    <th>Aprobar</th>
+                    <td>{{ material.id }}</td>
+                    <td>{{ material.material }}</td>
+                    <td>{{ material.cantidad }}</td>
+                    <td>
+                        <form action="{% url 'aprobar_material' material.id %}" method="post">
+                            {% csrf_token %}
+                            <input type="number" name="cantidad_real" min="0" value="{{ material.cantidad_real }}" required>
+                            <button type="submit">Aprobar</button>
+                        </form>
+                    </td>
                 </tr>
-                {% for material in materiales_pendientes %}
-                    <tr>
-                        <td>{{ material.id }}</td>
-                        <td>{{ material.material }}</td>
-                        <td>{{ material.cantidad }}</td>
-                        <td>
-                            <form action="{% url 'aprobar_material' material.id %}" method="post">
-                                {% csrf_token %}
-                                <button type="submit">Aprobar</button>
-                            </form>
-                        </td>
-                    </tr>
-                {% empty %}
-                    <tr>
-                        <td colspan="4">No hay materiales pendientes.</td>
-                    </tr>
-                {% endfor %}
-            </table>
+            {% empty %}
+                <tr>
+                    <td colspan="5">No hay materiales pendientes.</td>
+                </tr>
+            {% endfor %}
+        </table>
 
             <h2>Materiales Aprobados</h2>
             <table>
