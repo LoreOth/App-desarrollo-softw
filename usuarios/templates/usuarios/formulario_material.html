@@ -101,6 +101,9 @@
         
         <label for="id_cantidad">Cantidad:</label>
         {{ form.cantidad }}
+
+        <label for="id_zona">Zona:</label>
+        {{ form.id_zona }} <!-- Selector de zona -->
         
         <button type="submit">Enviar</button>
         <a href="{% url 'home' %}">

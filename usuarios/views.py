@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 
 from django.contrib.auth import authenticate, login
@@ -118,20 +119,21 @@ def logout_view(request):
 # Vista para el formulario del recolector
 @login_required
 def aprobar_material(request, material_id):
-    # Obtener el material por ID
-    material = get_object_or_404(Material, id=material_id)
-    
-    cantidad_a_sumar = material.cantidad  
-    
-    # Cambiar el estado del material a supervisado (aprobado)
-    material.supervisado = True
-    material.save()
-    
-    # Buscar el material en la tabla Materiales por su nombre
-    material_stock = get_object_or_404(Materiales, nombre=material.material)
-    
-    # Sumar la cantidad a la columna cantidad_total
-    material_stock.cantidad_total += cantidad_a_sumar
-    material_stock.save()
-    
-    return redirect('home')  # Redirigir a la página de inicio
+    if request.method == 'POST':
+        # Obtener el material usando get_object_or_404 para manejar errores si no existe
+        material = get_object_or_404(Material, id=material_id)
+
+        # Obtener la cantidad real ingresada en el formulario
+        cantidad_real = request.POST.get('cantidad_real')
+
+        if cantidad_real is not None:
+            # Actualizar la cantidad real y marcar como supervisado
+            material.cantidad_real = int(cantidad_real)
+            material.supervisado = True  # Cambiar el flag de supervisado a True
+            material.save()  # Guardar los cambios en la base de datos
+
+        # Redirigir al home después de guardar los cambios
+        return redirect('home')
+
+    # Si no es un método POST, retornar un error 405
+    return HttpResponse("Método no permitido", status=405)
