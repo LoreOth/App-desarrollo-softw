@@ -6,6 +6,7 @@ from usuarios.forms import Material, Materiales
 
 USERNAME = 'walter.bates'
 PASSWORD = 'bpm'
+USER_ID=4
 PUERTO = '12522'
 def login():
     login_url = f"http://localhost:{PUERTO}/bonita/loginservice"
@@ -70,7 +71,18 @@ def instantiate_process(x_bonita_api_cookie, jsessionid, process_id):
         return instantiate_response.json()
     return None
 
-def update_case_variable(x_bonita_api_cookie, jsessionid, case_id, nombre_variable, valor_variable):
+def update_case_variable(x_bonita_api_cookie, jsessionid, case_id, nombre_variable, valor_variable, tipo_variable):
+    """
+    Actualiza una variable de caso en Bonita Soft.
+    
+    :param x_bonita_api_cookie: Token de la API de Bonita.
+    :param jsessionid: ID de sesión JSESSIONID.
+    :param case_id: ID del caso en Bonita.
+    :param nombre_variable: Nombre de la variable a actualizar.
+    :param valor_variable: Valor que se asignará a la variable.
+    :param tipo_variable: Tipo Java de la variable (ej: 'java.lang.String', 'java.lang.Boolean', etc.).
+    :return: True si la actualización fue exitosa, False en caso contrario.
+    """
     # URL para actualizar la variable del caso
     update_url = f"http://localhost:{PUERTO}/bonita/API/bpm/caseVariable/{case_id}/{nombre_variable}"
     headers = {
@@ -79,12 +91,15 @@ def update_case_variable(x_bonita_api_cookie, jsessionid, case_id, nombre_variab
         'Cookie': f'BOS_Locale=es; JSESSIONID={jsessionid}; X-Bonita-API-Token={x_bonita_api_cookie}',
         'Content-Type': 'application/json'
     }
+
     body = {
-        "type": "java.lang.String",
+        "type": tipo_variable,
         "value": valor_variable
     }
-    response = requests.put(update_url, headers=headers, json=body)
 
+    # Hacemos la solicitud PUT
+    response = requests.put(update_url, headers=headers, json=body)
+    
     return response.status_code == 200
 
 def get_task_id_by_case_id(x_bonita_api_cookie, jsessionid, case_id):
@@ -164,17 +179,17 @@ def run_load_material(id_usuario, id_usuario_material):
     # updateamos las variables de bonita
     mail_recolector = 'juanmafazzano@gmail.com'
     material = 'Cartón'
-    validacion = True
+    validacion = 'false'#'true'
 
-    update_case_variable(x_bonita_api_cookie, jsessionid, case_id, 'id_recoleccion', id_usuario)
-    update_case_variable(x_bonita_api_cookie, jsessionid, case_id, 'mail_recolector', mail_recolector)
-    update_case_variable(x_bonita_api_cookie, jsessionid, case_id, 'material', material)
-    update_case_variable(x_bonita_api_cookie, jsessionid, case_id, 'validacion', validacion)
+    update_case_variable(x_bonita_api_cookie, jsessionid, case_id, 'id_recoleccion', id_usuario, 'java.lang.String')
+    update_case_variable(x_bonita_api_cookie, jsessionid, case_id, 'mail_recolector', mail_recolector, 'java.lang.String')
+    update_case_variable(x_bonita_api_cookie, jsessionid, case_id, 'material', material, 'java.lang.String')
+    update_case_variable(x_bonita_api_cookie, jsessionid, case_id, 'validacion', validacion, 'java.lang.Boolean')
 
     
     task_id = get_task_id_by_case_id(x_bonita_api_cookie, jsessionid, case_id)
 
-    assign_user_to_task_id(x_bonita_api_cookie, jsessionid, task_id, 4)
+    assign_user_to_task_id(x_bonita_api_cookie, jsessionid, task_id, USER_ID)
 
     execute_user_task(x_bonita_api_cookie, jsessionid, task_id)
     
