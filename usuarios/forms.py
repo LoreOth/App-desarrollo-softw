@@ -26,6 +26,8 @@ class Material(models.Model):
         blank=True,  # Hace que este campo sea opcional
         related_name='materiales'
     )  # Relación con la tabla Zona
+    bonita_task = models.CharField(null=True, blank=True,max_length=255) # Tarea asociada a Bonita
+
 
     def __str__(self):
         return self.material
@@ -54,4 +56,4 @@ class MaterialForm(forms.ModelForm):
 
     class Meta:
         model = Material
-        fields = ['material', 'cantidad', 'cantidad_real', 'id_zona', 'supervisado']
+        fields = ['material', 'cantidad', 'cantidad_real', 'id_zona', 'supervisado', 'bonita_task']

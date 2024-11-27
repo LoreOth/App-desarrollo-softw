@@ -76,14 +76,18 @@ def login_view(request):
 def formulario_material(request):
     if request.method == 'POST':
         form = MaterialForm(request.POST)
+        print('*'*50,form.is_valid, '*'*50)
         if form.is_valid():
+            print('entra')
             material = form.save(commit = False)  # Usa save() aquí
             material.user = request.user  # Asegúrate de que el usuario esté asociado
             material.save()  # Guarda la instancia en la base de datos
-
-            run_load_material(material.user_id, material.id)
+            run_load_material(material.user.email, material.material)  
             
             return redirect('home')  # Redirige a otra página después de guardar
+        else:
+            print('no entra')
+
     else:
         form = MaterialForm()
 

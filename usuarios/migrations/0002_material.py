@@ -19,6 +19,7 @@ class Migration(migrations.Migration):
                 ('material', models.CharField(max_length=255)),
                 ('cantidad', models.PositiveIntegerField()),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('bonita_task', models.CharField(blank=True, max_length=255, null=True)),
             ],
         ),
     ]

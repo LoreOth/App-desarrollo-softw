@@ -164,7 +164,7 @@ def execute_user_task(x_bonita_api_cookie, jsessionid, task_id):
             f"Error al ejecutar la tarea de usuario: {response.status_code}, {response.text}")
         return None
 
-def run_load_material(id_usuario, id_usuario_material):
+def run_load_material(mail_recolector, material):
     [x_bonita_api_cookie, jsessionid] = login()
 
     processes = get_processes(x_bonita_api_cookie, jsessionid)
@@ -177,14 +177,9 @@ def run_load_material(id_usuario, id_usuario_material):
     case_id = instantiated_process["caseId"]
 
     # updateamos las variables de bonita
-    mail_recolector = 'juanmafazzano@gmail.com'
-    material = 'Cartón'
-    validacion = 'false'#'true'
-
-    update_case_variable(x_bonita_api_cookie, jsessionid, case_id, 'id_recoleccion', id_usuario, 'java.lang.String')
+    update_case_variable(x_bonita_api_cookie, jsessionid, case_id, 'validacion', 'true', 'java.lang.Boolean')
     update_case_variable(x_bonita_api_cookie, jsessionid, case_id, 'mail_recolector', mail_recolector, 'java.lang.String')
     update_case_variable(x_bonita_api_cookie, jsessionid, case_id, 'material', material, 'java.lang.String')
-    update_case_variable(x_bonita_api_cookie, jsessionid, case_id, 'validacion', validacion, 'java.lang.Boolean')
 
     
     task_id = get_task_id_by_case_id(x_bonita_api_cookie, jsessionid, case_id)
