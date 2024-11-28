@@ -6,9 +6,10 @@ from usuarios.forms import Material, Materiales
 
 USERNAME = 'walter.bates'
 PASSWORD = 'bpm'
-
+USER_ID=4
+PUERTO = '8080'
 def login():
-    login_url = "http://localhost:8080/bonita/loginservice"
+    login_url = f"http://localhost:{PUERTO}/bonita/loginservice"
     login_data = {
         'username': USERNAME,
         'password': PASSWORD
@@ -31,11 +32,11 @@ def login():
 
 
 def get_processes(x_bonita_api_cookie, jsessionid):
-    process_url = "http://localhost:8080/bonita/API/bpm/process?p=0&c=10"
+    process_url = f"http://localhost:{PUERTO}/bonita/API/bpm/process?p=0&c=10"
     
     headers = {
         'X-Bonita-API-Token': x_bonita_api_cookie,
-        'Host': 'localhost:8080',
+        'Host': f'localhost:{PUERTO}',
         'Cookie': f'BOS_Locale=es; JSESSIONID={jsessionid}; X-Bonita-API-Token={x_bonita_api_cookie}'
     }
 
@@ -54,12 +55,12 @@ def find_process_by_name(processes, process_name):
 
 def instantiate_process(x_bonita_api_cookie, jsessionid, process_id):
     # URL para instanciar el proceso
-    instantiate_url = f"http://localhost:8080/bonita/API/bpm/process/{process_id}/instantiation"
+    instantiate_url = f"http://localhost:{PUERTO}/bonita/API/bpm/process/{process_id}/instantiation"
 
     # Configurar el header con el token X-Bonita-API-Token
     headers = {
         'X-Bonita-API-Token': x_bonita_api_cookie,
-        'Host': 'localhost:8080',
+        'Host': f'localhost:{PUERTO}',
         'Cookie': f'BOS_Locale=es; JSESSIONID={jsessionid}; X-Bonita-API-Token={x_bonita_api_cookie}'
     }
 
@@ -70,29 +71,43 @@ def instantiate_process(x_bonita_api_cookie, jsessionid, process_id):
         return instantiate_response.json()
     return None
 
-def update_case_variable(x_bonita_api_cookie, jsessionid, case_id, nombre_variable, valor_variable):
+def update_case_variable(x_bonita_api_cookie, jsessionid, case_id, nombre_variable, valor_variable, tipo_variable):
+    """
+    Actualiza una variable de caso en Bonita Soft.
+    
+    :param x_bonita_api_cookie: Token de la API de Bonita.
+    :param jsessionid: ID de sesión JSESSIONID.
+    :param case_id: ID del caso en Bonita.
+    :param nombre_variable: Nombre de la variable a actualizar.
+    :param valor_variable: Valor que se asignará a la variable.
+    :param tipo_variable: Tipo Java de la variable (ej: 'java.lang.String', 'java.lang.Boolean', etc.).
+    :return: True si la actualización fue exitosa, False en caso contrario.
+    """
     # URL para actualizar la variable del caso
-    update_url = f"http://localhost:8080/bonita/API/bpm/caseVariable/{case_id}/{nombre_variable}"
+    update_url = f"http://localhost:{PUERTO}/bonita/API/bpm/caseVariable/{case_id}/{nombre_variable}"
     headers = {
         'X-Bonita-API-Token': x_bonita_api_cookie,
-        'Host': 'localhost:8080',
+        'Host': f'localhost:{PUERTO}',
         'Cookie': f'BOS_Locale=es; JSESSIONID={jsessionid}; X-Bonita-API-Token={x_bonita_api_cookie}',
         'Content-Type': 'application/json'
     }
+
     body = {
-        "type": "java.lang.String",
+        "type": tipo_variable,
         "value": valor_variable
     }
-    response = requests.put(update_url, headers=headers, json=body)
 
+    # Hacemos la solicitud PUT
+    response = requests.put(update_url, headers=headers, json=body)
+    
     return response.status_code == 200
 
 def get_task_id_by_case_id(x_bonita_api_cookie, jsessionid, case_id):
-    get_url = f"http://localhost:8080/bonita/API/bpm/task?f=caseId={case_id}"
+    get_url = f"http://localhost:{PUERTO}/bonita/API/bpm/task?f=caseId={case_id}"
 
     headers = {
         'X-Bonita-API-Token': x_bonita_api_cookie,
-        'Host': 'localhost:8080',
+        'Host': f'localhost:{PUERTO}',
         'Cookie': f'BOS_Locale=es; JSESSIONID={jsessionid}; X-Bonita-API-Token={x_bonita_api_cookie}'
     }
 
@@ -106,11 +121,11 @@ def get_task_id_by_case_id(x_bonita_api_cookie, jsessionid, case_id):
     return None
 
 def assign_user_to_task_id(x_bonita_api_cookie, jsessionid, task_id, assigned_id):
-    update_url = f"http://localhost:8080/bonita/API/bpm/humanTask/{task_id}"
+    update_url = f"http://localhost:{PUERTO}/bonita/API/bpm/humanTask/{task_id}"
 
     headers = {
         'X-Bonita-API-Token': x_bonita_api_cookie,
-        'Host': 'localhost:8080',
+        'Host': f'localhost:{PUERTO}',
         'Cookie': f'BOS_Locale=es; JSESSIONID={jsessionid}; X-Bonita-API-Token={x_bonita_api_cookie}',
         'Content-Type': 'application/json'
     }
@@ -124,12 +139,12 @@ def assign_user_to_task_id(x_bonita_api_cookie, jsessionid, task_id, assigned_id
 
 def execute_user_task(x_bonita_api_cookie, jsessionid, task_id):
     # URL para ejecutar la tarea de usuario con el taskId
-    execute_url = f"http://localhost:8080/bonita/API/bpm/userTask/{task_id}/execution"
+    execute_url = f"http://localhost:{PUERTO}/bonita/API/bpm/userTask/{task_id}/execution"
 
     # Configurar el header con el token X-Bonita-API-Token
     headers = {
         'X-Bonita-API-Token': x_bonita_api_cookie,
-        'Host': 'localhost:8080',
+        'Host': f'localhost:{PUERTO}',
         'Cookie': f'BOS_Locale=es; JSESSIONID={jsessionid}; X-Bonita-API-Token={x_bonita_api_cookie}',
         'Content-Type': 'application/json'
     }
@@ -149,23 +164,37 @@ def execute_user_task(x_bonita_api_cookie, jsessionid, task_id):
             f"Error al ejecutar la tarea de usuario: {response.status_code}, {response.text}")
         return None
 
-def run_load_material(id_usuario, id_usuario_material):
+def recoleccion_materiales(mail_recolector, material):
     [x_bonita_api_cookie, jsessionid] = login()
 
     processes = get_processes(x_bonita_api_cookie, jsessionid)
     process_name = processes[0]['name']
 
     process_id = find_process_by_name(processes, process_name)
+
     instantiated_process = instantiate_process(x_bonita_api_cookie, jsessionid, process_id)
 
+    case_id = instantiated_process["caseId"]
+
     # updateamos las variables de bonita
-    update_case_variable(x_bonita_api_cookie, jsessionid, case_id, 'id_recolector', id_usuario)
-    update_case_variable(x_bonita_api_cookie, jsessionid, case_id, 'id_solicitud', id_usuario_material)
+#    update_case_variable(x_bonita_api_cookie, jsessionid, case_id, 'validacion', 'true', 'java.lang.Boolean')
+    update_case_variable(x_bonita_api_cookie, jsessionid, case_id, 'mail_recolector', mail_recolector, 'java.lang.String')
+    update_case_variable(x_bonita_api_cookie, jsessionid, case_id, 'material', material, 'java.lang.String')
+
     
     task_id = get_task_id_by_case_id(x_bonita_api_cookie, jsessionid, case_id)
 
-    assign_user_to_task_id(x_bonita_api_cookie, jsessionid, task_id, 4)
+    assign_user_to_task_id(x_bonita_api_cookie, jsessionid, task_id, USER_ID)
 
     execute_user_task(x_bonita_api_cookie, jsessionid, task_id)
-    case_id = instantiated_process["caseId"]
+    return case_id
+    
+def validar_materiales(case_id, es_cantidad_real):
+    print(case_id, es_cantidad_real)
+    [x_bonita_api_cookie, jsessionid] = login()
+    update_case_variable(x_bonita_api_cookie, jsessionid, case_id, 'validacion', es_cantidad_real, 'java.lang.Boolean')
+    task_id = get_task_id_by_case_id(x_bonita_api_cookie, jsessionid, case_id)
 
+    assign_user_to_task_id(x_bonita_api_cookie, jsessionid, task_id, USER_ID)
+
+    execute_user_task(x_bonita_api_cookie, jsessionid, task_id)

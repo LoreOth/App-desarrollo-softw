@@ -9,15 +9,21 @@
             font-family: 'Arial', sans-serif;
             background-color: #2c3e50;
             color: white;
-            padding: 20px;
             margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* Altura completa de la ventana */
+            padding: 20px;
+            box-sizing: border-box;
         }
         .container {
             max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
+            width: 100%;
             background-color: rgba(44, 62, 80, 0.8);
             border-radius: 8px;
+            padding: 20px;
+            text-align: center;
         }
         h1 {
             font-size: 2.5em;
@@ -56,6 +62,11 @@
         .logout:hover {
             color: #f39c12;
         }
+        /* Contenedor para scroll horizontal en tablas */
+        .table-wrapper {
+            overflow-x: auto;
+            margin-top: 15px;
+        }
         /* Media queries para hacerlo responsive */
         @media (max-width: 1200px) {
             h1 {
@@ -79,6 +90,11 @@
                 padding: 6px;
                 font-size: 0.9em;
             }
+            .logout {
+                font-size: 0.9em;
+                top: 5px;
+                right: 5px;
+            }
         }
         @media (max-width: 480px) {
             h1 {
@@ -92,7 +108,14 @@
                 font-size: 0.8em;
             }
             .logout {
-                font-size: 0.9em;
+                font-size: 0.8em;
+                position: static;
+                display: block;
+                margin-bottom: 10px;
+                text-align: right;
+            }
+            .table-wrapper {
+                margin-top: 10px;
             }
         }
     </style>
@@ -105,36 +128,40 @@
         <p>Utiliza el menú para navegar a las diferentes secciones.</p>
 
         {% if request.user.rol == 'DEPOSITO' %}
+        <a href="{% url 'resumen_materiales_recicladores    ' %}" class="button">Resumen estado actual</a>
         <h2>Materiales Pendientes</h2>
-        <table>
-            <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Cantidad</th>
-                <th>Cantidad Real</th>
-                <th>Aprobar</th>
-            </tr>
-            {% for material in materiales_pendientes %}
+        <div class="table-wrapper">
+            <table>
                 <tr>
-                    <td>{{ material.id }}</td>
-                    <td>{{ material.material }}</td>
-                    <td>{{ material.cantidad }}</td>
-                    <td>
-                        <form action="{% url 'aprobar_material' material.id %}" method="post">
-                            {% csrf_token %}
-                            <input type="number" name="cantidad_real" min="0" value="{{ material.cantidad_real }}" required>
-                            <button type="submit">Aprobar</button>
-                        </form>
-                    </td>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Cantidad</th>
+                    <th>Cantidad Real</th>
+                    <th>Aprobar</th>
                 </tr>
-            {% empty %}
-                <tr>
-                    <td colspan="5">No hay materiales pendientes.</td>
-                </tr>
-            {% endfor %}
-        </table>
+                {% for material in materiales_pendientes %}
+                    <tr>
+                        <td>{{ material.id }}</td>
+                        <td>{{ material.material }}</td>
+                        <td>{{ material.cantidad }}</td>
+                        <td>
+                            <form action="{% url 'aprobar_material' material.id %}" method="post">
+                                {% csrf_token %}
+                                <input type="number" name="cantidad_real" min="0" value="{{ material.cantidad_real }}" required>
+                                <button type="submit">Aprobar</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5">No hay materiales pendientes.</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
 
-            <h2>Materiales Aprobados</h2>
+        <h2>Materiales Aprobados</h2>
+        <div class="table-wrapper">
             <table>
                 <tr>
                     <th>ID</th>
@@ -153,10 +180,14 @@
                     </tr>
                 {% endfor %}
             </table>
+        </div>
         {% endif %}
         
         {% if request.user.rol == 'RECOLECTOR' %}
-            <a href="{% url 'formulario_material' %}">Registrar Material</a>
+            <a href="{% url 'formulario_material' %}" class="button">Registrar Material</a>
+            <p></p>
+            <a href="{% url 'reporte_meteriales' %}" class="button">Ver Reporte de Materiales</a>
+
         {% endif %}
     </div>
 </body>
