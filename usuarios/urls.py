@@ -9,4 +9,6 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logOut'),  
     path('registro/', registro_view, name='registro'),
     path('aprobar-material/<int:material_id>/', views.aprobar_material, name='aprobar_material'),
+    path('materiales/', views.MaterialesListView.as_view(), name='listar_materiales'),
+    path('materiales/actualizar/', views.ActualizarCantidadMaterialView.as_view(), name='actualizar_material'),
 ]

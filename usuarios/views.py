@@ -4,6 +4,8 @@ from django.shortcuts import get_object_or_404, render
 from django.contrib.auth import authenticate, login
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+
+from usuarios.serializers import MaterialesSerializer
 from .forms import Material, MaterialForm, Materiales
 from django.contrib.auth import logout
 from django.shortcuts import render, redirect
@@ -18,6 +20,9 @@ from django.contrib.auth.decorators import login_required, permission_required
 from .models import Usuario  # Importar el modelo personalizado
 
 from .functions.load_material import run_load_material
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 
 # Vista para el registro de usuarios
 def registro_view(request):
@@ -141,3 +146,52 @@ def aprobar_material(request, material_id):
     # Si no es un método POST, retornar un error 405
     return HttpResponse("Método no permitido", status=405)
 
+class MaterialesListView(APIView):
+    """
+    Vista para devolver todos los materiales.
+    """
+    def get(self, request):
+        materiales = Materiales.objects.all()
+        serializer = MaterialesSerializer(materiales, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+class ActualizarCantidadMaterialView(APIView):
+    """
+    Vista para actualizar la cantidad total de un material, restando una cantidad específica.
+    """
+
+    def post(self, request):
+        # Obtener el nombre y la cantidad a restar del cuerpo de la solicitud
+        nombre = request.data.get('nombre')
+        cantidad = request.data.get('cantidad')
+
+        if not nombre or cantidad is None:
+            return Response({
+                "error": "Se requieren los campos 'nombre' y 'cantidad'"
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            cantidad = int(cantidad)
+            if cantidad < 0:
+                raise ValueError("La cantidad a restar no puede ser negativa.")
+        except ValueError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Buscar el material por nombre
+        try:
+            material = Materiales.objects.get(nombre=nombre)
+        except Materiales.DoesNotExist:
+            return Response({"error": "Material no encontrado"}, status=status.HTTP_404_NOT_FOUND)
+
+        # Restar la cantidad
+        nueva_cantidad = material.cantidad_total - cantidad
+        if nueva_cantidad < 0:
+            return Response({"error": "La cantidad no puede ser menor a 0"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Actualizar la cantidad y guardar el material
+        material.cantidad_total = nueva_cantidad
+        material.save()
+
+        return Response({
+            "success": "Cantidad total actualizada con éxito",
+            "data": {"nombre": material.nombre, "cantidad_total": material.cantidad_total}
+        }, status=status.HTTP_200_OK)
