@@ -7,7 +7,7 @@ from usuarios.forms import Material, Materiales
 USERNAME = 'walter.bates'
 PASSWORD = 'bpm'
 USER_ID=4
-PUERTO = '12522'
+PUERTO = '8080'
 def login():
     login_url = f"http://localhost:{PUERTO}/bonita/loginservice"
     login_data = {
@@ -164,11 +164,13 @@ def execute_user_task(x_bonita_api_cookie, jsessionid, task_id):
             f"Error al ejecutar la tarea de usuario: {response.status_code}, {response.text}")
         return None
 
-def run_load_material(mail_recolector, material):
+def recoleccion_materiales(mail_recolector, material):
     [x_bonita_api_cookie, jsessionid] = login()
 
     processes = get_processes(x_bonita_api_cookie, jsessionid)
+    print('processes ', processes)
     process_name = processes[0]['name']
+    print('process_name ', process_name)
 
     process_id = find_process_by_name(processes, process_name)
 
@@ -177,7 +179,7 @@ def run_load_material(mail_recolector, material):
     case_id = instantiated_process["caseId"]
 
     # updateamos las variables de bonita
-    update_case_variable(x_bonita_api_cookie, jsessionid, case_id, 'validacion', 'true', 'java.lang.Boolean')
+#    update_case_variable(x_bonita_api_cookie, jsessionid, case_id, 'validacion', 'true', 'java.lang.Boolean')
     update_case_variable(x_bonita_api_cookie, jsessionid, case_id, 'mail_recolector', mail_recolector, 'java.lang.String')
     update_case_variable(x_bonita_api_cookie, jsessionid, case_id, 'material', material, 'java.lang.String')
 
@@ -187,4 +189,14 @@ def run_load_material(mail_recolector, material):
     assign_user_to_task_id(x_bonita_api_cookie, jsessionid, task_id, USER_ID)
 
     execute_user_task(x_bonita_api_cookie, jsessionid, task_id)
+    return case_id
     
+def validar_materiales(case_id, es_cantidad_real):
+    print(case_id, es_cantidad_real)
+    [x_bonita_api_cookie, jsessionid] = login()
+    update_case_variable(x_bonita_api_cookie, jsessionid, case_id, 'validacion', es_cantidad_real, 'java.lang.Boolean')
+    task_id = get_task_id_by_case_id(x_bonita_api_cookie, jsessionid, case_id)
+
+    assign_user_to_task_id(x_bonita_api_cookie, jsessionid, task_id, USER_ID)
+
+    execute_user_task(x_bonita_api_cookie, jsessionid, task_id)

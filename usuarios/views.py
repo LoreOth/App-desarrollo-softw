@@ -15,7 +15,7 @@ from .forms import MaterialForm
 
 from .models import Usuario  # Importar el modelo personalizado
 
-from .functions.load_material import run_load_material
+from .functions.load_material import recoleccion_materiales, validar_materiales
 
 # Vista para el registro de usuarios
 def registro_view(request):
@@ -76,17 +76,15 @@ def login_view(request):
 def formulario_material(request):
     if request.method == 'POST':
         form = MaterialForm(request.POST)
-        print('*'*50,form.is_valid, '*'*50)
         if form.is_valid():
-            print('entra')
             material = form.save(commit = False)  # Usa save() aquí
             material.user = request.user  # Asegúrate de que el usuario esté asociado
-            material.save()  # Guarda la instancia en la base de datos
-            run_load_material(material.user.email, material.material)  
             
+            case_id = recoleccion_materiales(material.user.email, material.material)  
+            material.bonita_task = case_id
+            material.save()  # Guarda la instancia en la base de datos
             return redirect('home')  # Redirige a otra página después de guardar
-        else:
-            print('no entra')
+
 
     else:
         form = MaterialForm()
@@ -135,6 +133,8 @@ def aprobar_material(request, material_id):
             material.cantidad_real = int(cantidad_real)
             material.supervisado = True  # Cambiar el flag de supervisado a True
             material.save()  # Guardar los cambios en la base de datos
+            es_cantidad_real = 'true' if material.cantidad_real == material.cantidad else 'false'
+            validar_materiales(material.bonita_task, es_cantidad_real)  
 
         # Redirigir al home después de guardar los cambios
         return redirect('home')
