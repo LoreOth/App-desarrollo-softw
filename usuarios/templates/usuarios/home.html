@@ -183,7 +183,10 @@
         {% endif %}
         
         {% if request.user.rol == 'RECOLECTOR' %}
-            <a href="{% url 'formulario_material' %}">Registrar Material</a>
+            <a href="{% url 'formulario_material' %}" class="button">Registrar Material</a>
+            <p></p>
+            <a href="{% url 'reporte_meteriales' %}" class="button">Ver Reporte de Materiales</a>
+
         {% endif %}
     </div>
 </body>

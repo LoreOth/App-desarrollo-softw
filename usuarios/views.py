@@ -12,10 +12,11 @@ from django.contrib.auth import login
 from django.contrib.auth.hashers import make_password
 from django.contrib import messages
 from .forms import MaterialForm
-
 from .models import Usuario  # Importar el modelo personalizado
-
 from .functions.load_material import recoleccion_materiales, validar_materiales
+from django.utils.timezone import now, timedelta
+from django.db.models import Avg, Count, F, Q
+
 
 # Vista para el registro de usuarios
 def registro_view(request):
@@ -141,3 +142,30 @@ def aprobar_material(request, material_id):
 
     # Si no es un método POST, retornar un error 405
     return HttpResponse("Método no permitido", status=405)
+
+
+
+
+@login_required
+def reporte_meteriales(request):
+    if request.user.rol != 'RECOLECTOR':
+        return HttpResponse("No autorizado", status=403)
+
+    # Calcular el rango de fechas de las últimas 2 semanas
+    #fecha_limite = now() - timedelta(weeks=2)
+
+    # Filtrar materiales recolectados en las últimas 2 semanas
+    materiales = Material.objects
+
+    # Métricas
+    cantidad_recolecciones = materiales.count()
+    recolecciones_modificadas = materiales.filter(cantidad_real__isnull=False).count()
+    porcentaje_modificadas = (recolecciones_modificadas / cantidad_recolecciones) * 100 if cantidad_recolecciones > 0 else 0
+    promedio_por_material = materiales.values('material').annotate(promedio=Avg('cantidad'))
+
+    contexto = {
+        'cantidad_recolecciones': cantidad_recolecciones,
+        'porcentaje_modificadas': porcentaje_modificadas,
+        'promedio_por_material': promedio_por_material,
+    }
+    return render(request, 'usuarios/reporte_meteriales.html', contexto)

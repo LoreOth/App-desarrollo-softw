@@ -168,9 +168,7 @@ def recoleccion_materiales(mail_recolector, material):
     [x_bonita_api_cookie, jsessionid] = login()
 
     processes = get_processes(x_bonita_api_cookie, jsessionid)
-    print('processes ', processes)
     process_name = processes[0]['name']
-    print('process_name ', process_name)
 
     process_id = find_process_by_name(processes, process_name)
 

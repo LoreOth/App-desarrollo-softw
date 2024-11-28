@@ -4,6 +4,8 @@ from .views import registro_view
 urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('formulario-material/', views.formulario_material, name='formulario_material'),
+    path('reporte_meteriales/', views.reporte_meteriales, name='reporte_meteriales'),
+
     path('gracias/', views.gracias, name='gracias'),
     path('home/', views.home, name='home'),
     path('', views.home, name='home'),
